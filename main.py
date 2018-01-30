@@ -23,7 +23,7 @@ circle = elements.Circle(config) # config = {'r': 12, 'x': 12 ...}
 first_frame = animator.new_frame() # initialize with empty blank image, can't change width/height attributes
 first_frame.set_image(circle.translate(10, 10)) # doesn't render yet, only after compiling
 
-animator.add_frame(1, first_frame)
+animator.add_frame_object(1, first_frame)
 
 # translate, starting from from_pos to to_pos, with trail_settings
 trail_settings = {
