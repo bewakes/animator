@@ -9,7 +9,7 @@ class Drawable:
     def __init__(self):
         pass
 
-    def render(self):
+    def render_to(self, image):
         raise NotImplementedError
 
     def transform(self):

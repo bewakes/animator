@@ -1,4 +1,5 @@
 from animator.elements.drawable import Drawable
+from PIL import Image, ImageDraw
 
 class Circle(Drawable):
     """
@@ -17,11 +18,23 @@ class Circle(Drawable):
         self._radius = radius
         self._filled = extras.get('filled', False)
         self._color = extras.get('color', 'skyblue')
+        self._stroke = extras.get('color', 'black')
         self._opacity = extras.get('opacity', 1)
 
-    def render(self):
+    def get_bounding_box(self):
+        return (
+            self._center[0]-self._radius, self._center[1]-self._radius,
+            self._center[0]+self._radius, self._center[1]+self._radius
+        )
+
+    def render_to(self, image):
         """
         Return image object corresponding to the attributes
+        Parameters
+        ----------
+        image : a pillow Image object to which the circle is rendered
         """
-        pass
+        draw = ImageDraw.Draw(image)
+        draw.ellipse(self.get_bounding_box(), fill=(200,200,0,255))
+        return image
 

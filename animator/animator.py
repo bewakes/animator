@@ -1,3 +1,6 @@
+from PIL import Image
+
+
 DEFAULT_FPS = 30
 DEFAULT_HEIGHT = 480
 DEFAULT_WIDTH = 640
@@ -6,7 +9,7 @@ DEFAULT_DURATION = 10  # seconds
 
 class AnimatorConfig:
     def __init__(self):
-        self.width = DEFAULT_WIDTH,
+        self.width = DEFAULT_WIDTH
         self.height = DEFAULT_HEIGHT
         self.fps = DEFAULT_FPS
         self.duration = 10  # seconds
@@ -48,10 +51,12 @@ class Animator:
             self.add_frame_object(start_index+i, drawable)
 
     def compile_frames(self):
-        for frame in self._raw_frames:
-            # TODO: Image and functions
-            image = Image()
+        for ind, frame in enumerate(self._raw_frames):
+            image = Image.new('RGB', (self._width, self._height))
             for drawable in frame:
-                image.paste(drawable.render())
-            self._compiled_frames.append(image)
+                image.paste(drawable.render_to(image))
+            self._compiled_frames[ind] = image
+
+    def get_compiled_frame(self, index):
+        return self._compiled_frames[index]
 
