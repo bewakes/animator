@@ -1,6 +1,18 @@
 from animator.elements.drawable import Drawable
 from PIL import Image, ImageDraw
 
+DEFAULT_COLOR = (255, 0, 0, 255)
+DEFAULT_RADIUS = 20
+DEFAULT_CENTER = (0, 0)
+
+class CircleConfig:
+    def __init__(self):
+        self.color = DEFAULT_COLOR
+        self.radius = DEFAULT_RADIUS
+        self.center = DEFAULT_CENTER
+        self.filled = True
+
+
 class Circle(Drawable):
     """
     Circle Drawable class
