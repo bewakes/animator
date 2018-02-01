@@ -1,19 +1,20 @@
 from animator.animator import Animator, AnimatorConfig
-from animator.elements import Circle
+from animator.elements import Circle, CircleConfig
 
 def test_animator():
     conf = AnimatorConfig()
     conf.duration = 1
-    conf.fps = 1
+    conf.fps = 30
     animator = Animator(conf)
-    circle =  Circle((0,0), 10)
-    circle2 =  Circle((50,50), 10)
-    animator.add_frame_object(0, circle)  # set first frame
-    animator.add_frame_object(0, circle2)  # add another circle
+    circle =  Circle(CircleConfig())
+    #animator.add_frame_object(0, circle)  # set first frame
+    #animator.add_frame_object(0, circle.translate((30, 400)))  # add another circle
+    translated_objects = circle.translate((100, 300), frames=animator.total_frames)
+    animator.add_frames_objects(0, translated_objects)
     animator.compile_frames()
-    image = animator.get_compiled_frame(0)
-    print(image)
-    image.save('/tmp/temp.jpg')
+    images = animator.get_compiled_frames()
+    for i, img in enumerate(images):
+        img.save('/tmp/temp{}.jpg'.format(i))
 
 if __name__ == '__main__':
     test_animator()

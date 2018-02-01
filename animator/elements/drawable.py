@@ -1,3 +1,5 @@
+from copy import copy
+
 class NotImplementedError(Exception):
     pass
 
@@ -14,3 +16,11 @@ class Drawable:
 
     def transform(self):
         raise NotImplementedError
+
+    def copy(self):
+        raise NotImplementedError
+
+    def translate(self, vector, frames=1):
+        """vector is a tuple (x, y)"""
+        raise NotImplementedError
+

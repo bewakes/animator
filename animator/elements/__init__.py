@@ -1,1 +1,1 @@
-from .circle import Circle
+from .circle import Circle, CircleConfig

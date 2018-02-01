@@ -39,6 +39,11 @@ class Animator:
         self._raw_frames = [[] for _ in range(self._total_frames)]
         self._compiled_frames = [None for _ in range(self._total_frames)]
 
+    @property
+    def total_frames(self):
+        return self._total_frames
+
+
     def add_frame_object(self, frame_index, drawable):
         """Add a drawable object to frame slot given by frame_index"""
         assert frame_index >= 0, "No negative indexing"
@@ -60,3 +65,5 @@ class Animator:
     def get_compiled_frame(self, index):
         return self._compiled_frames[index]
 
+    def get_compiled_frames(self):
+        return self._compiled_frames
