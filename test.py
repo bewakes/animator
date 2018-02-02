@@ -23,7 +23,7 @@ def test_animator():
     animator.compile_frames()
     images = animator.get_compiled_frames()
     for i, img in enumerate(images):
-        img.save('/tmp/temp{}.jpg'.format(i))
+        img.save('/tmp/temp{}.jpg'.format(i), subsampling=0, quality=100)
 
 if __name__ == '__main__':
     test_animator()
