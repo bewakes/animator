@@ -8,11 +8,17 @@ DEFAULT_DURATION = 10  # seconds
 
 
 class AnimatorConfig:
-    def __init__(self):
-        self.width = DEFAULT_WIDTH
-        self.height = DEFAULT_HEIGHT
-        self.fps = DEFAULT_FPS
-        self.duration = 10  # seconds
+    def __init__(
+            self,
+            width=DEFAULT_WIDTH,
+            height=DEFAULT_HEIGHT,
+            fps=DEFAULT_FPS,
+            duration=DEFAULT_DURATION
+            ):
+        self.width = width
+        self.height = height
+        self.fps = fps
+        self.duration = duration
 
 
 class Animator:
