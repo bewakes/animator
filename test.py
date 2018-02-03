@@ -30,11 +30,13 @@ def test_animator():
     newtxt = Text(text_conf)
     animator.add_frames_objects(0, newtxt.fade_out(animator.total_frames))
 
-    text_conf.position = (0, 50)
+    text_conf.position = (50, 50)
     text_conf.size = 30
-    text_conf.text = "Trying to make a video maker of my own"
-    rollertext = Text(text_conf)
-    animator.add_frames_objects(0, rollertext.roll(animator.total_frames))
+    text_conf.text = "Trying  cool. ain't  it   ?  my name is bibek pandey.. hello there.. does that mke any difference? to make a video maker of my own, Now i need to do text wrap is it seriously working? the text wrapping? if it is, then it surely is a great thing"
+    rollertext = Text.new(text_conf, animator._width)
+    # rollertext = Text(text_conf)
+    animator.add_frame_object(0, rollertext)
+    # animator.add_frames_objects(0, rollertext.roll(animator.total_frames))
 
     animator.compile_frames()
     images = animator.get_compiled_frames()

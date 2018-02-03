@@ -32,13 +32,46 @@ class Text(Drawable):
     _color : color of the text
     _text : the text to be rendered
     _size : the size of the text
+    _wrapped_texts : wrapped texts objects of the given long text
     """
-    def __init__(self, config=TextConfig()):
+    def __init__(self, config=TextConfig(), wrapped_texts=None):
+        if '\n' in config.text or '\r' in config.text:
+            raise Exception("Please don't use newlines in text, instead use multiple texts")
         self._text = config.text
         self._color = config.color
         self._size = config.size
         self._position = config.position
         self._font = config.font
+        self._wrapped_texts = wrapped_texts
+
+    @classmethod
+    def new(cls, config, width):
+        """
+        Returns wrapped Text object based on config and window width
+        """
+        OFFSET = 15  # line height offset
+        xpos = config.position[0]
+        font = ImageFont.truetype(config.font, config.size)
+        size = font.getsize(config.text)
+        lineheight = size[1]
+        if xpos + size[0] > width:  # needs to be wrapped
+            wrapped = []
+            curr_pos = 0
+            while True:
+                pos = _get_next_wrap_index(config.text[curr_pos:], config, width, font)
+                if pos is None:
+                    wrapped.append(config.text[curr_pos:])
+                    break
+                wrapped.append(config.text[curr_pos:curr_pos+pos+1])
+                curr_pos += pos + 1
+        assert len(config.text) == len(''.join(wrapped))
+        child_texts = []
+        for i, x in enumerate(wrapped):
+            ypos = config.position[1] + lineheight + OFFSET
+            config.position = (xpos, ypos)
+            config.text = x
+            child_texts.append(Text(config))
+        return Text(config, wrapped_texts=child_texts)
 
     def get_config(self):
         conf = TextConfig()
@@ -58,7 +91,8 @@ class Text(Drawable):
         @vector : (x, y) is translation vector
         @frames : if provided returns objects by interpolating
         """
-        pass
+        # TODO: implement this
+        return self.copy()
 
     def fade_in(self, frames=2, start_opacity=0, final_opacity=1):
         """
@@ -122,13 +156,56 @@ class Text(Drawable):
         Return Image object corresponding to the attributes.
         """
         # draw = ImageDraw.Draw(image)
-        txt = Image.new('RGBA', image.size, (255,255,255,0))
-        draw = ImageDraw.Draw(txt)
-        if self._font:
-            font = ImageFont.truetype(self._font, self._size)
-            draw.text(self._position, self._text, fill=self._color, font=font)
+        if not self._wrapped_texts:
+            txt = Image.new('RGBA', image.size, (255,255,255,0))
+            draw = ImageDraw.Draw(txt)
+            if self._font:
+                font = ImageFont.truetype(self._font, self._size)
+                draw.text(self._position, self._text, fill=self._color, font=font)
+            else:
+                draw.text(self._position, self._text, self._color)
+            img = Image.alpha_composite(image, txt)
+            return img
         else:
-            draw.text(self._position, self._text, self._color)
-        txt.convert("RGB")
-        img = Image.alpha_composite(image, txt)
-        return img
+            for x in self._wrapped_texts:
+                img = x.render_to(image)
+                image = Image.alpha_composite(image, img)
+            return image
+
+
+##################### helpers ###
+def _get_next_wrap_index(text, config, width, font):
+    xpos = config.position[0]
+    if not _exceeds_width(text, xpos, width, font):
+        return None
+    size = font.getsize(text)
+    # find ratio of text width to width of image - starting position
+    ratio = (width - xpos) / float(size[0])
+    # approximate index of where to wrap
+    approx_ind = int(ratio * len(text))
+    # if approx_ind+1 < len(text) and text[approx_ind+1] == ' ':
+    #     return approx_ind + 1
+    # find a space before the index from where we might wrap text
+    while True:
+        space_pos = _previous_space_pos(approx_ind, text)
+        if not _exceeds_width(text[:space_pos-1], xpos, width, font):
+            return space_pos
+        approx_ind = space_pos - 1
+
+
+def _exceeds_width(text, xpos, width, font):
+    size = font.getsize(text)
+    return xpos + size[0] > width
+
+
+def _previous_space_pos(curr_index, text):
+    """
+    Returns the next space ahead of current_index
+    """
+    if text[curr_index] == ' ':
+        return curr_index
+    for x in range(curr_index-1, -1, -1):
+        if text[x] == ' ':
+            return x
+    # no space, return the same index
+    return curr_index

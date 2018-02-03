@@ -70,7 +70,11 @@ class Animator:
         for ind, frame in enumerate(self._raw_frames):
             image = Image.new('RGBA', (self._width, self._height), self._background)
             for drawable in frame:
-                image.paste(drawable.render_to(image))
+                if type(drawable) != list:
+                    image.paste(drawable.render_to(image))
+                else:
+                    for x in drawable:
+                        image.paste(x.render_to(image))
             self._compiled_frames[ind] = image
 
     def get_compiled_frame(self, index):
