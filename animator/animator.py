@@ -5,6 +5,7 @@ DEFAULT_FPS = 30
 DEFAULT_HEIGHT = 480
 DEFAULT_WIDTH = 640
 DEFAULT_DURATION = 10  # seconds
+DEFAULT_BACKGROUND = (0, 0, 0, 255)
 
 
 class AnimatorConfig:
@@ -13,12 +14,14 @@ class AnimatorConfig:
             width=DEFAULT_WIDTH,
             height=DEFAULT_HEIGHT,
             fps=DEFAULT_FPS,
-            duration=DEFAULT_DURATION
+            duration=DEFAULT_DURATION,
+            background=DEFAULT_BACKGROUND
             ):
         self.width = width
         self.height = height
         self.fps = fps
         self.duration = duration
+        self.background = background
 
 
 class Animator:
@@ -34,6 +37,7 @@ class Animator:
     _total_frames : total number of frames
     _height : height of each frame
     _width : width of each frame
+    _background : background color
     """
     def __init__(self, config=AnimatorConfig()):
         self._config = config
@@ -44,6 +48,7 @@ class Animator:
         self._total_frames = self._duration * self._fps
         self._raw_frames = [[] for _ in range(self._total_frames)]
         self._compiled_frames = [None for _ in range(self._total_frames)]
+        self._background = config.background
 
     @property
     def total_frames(self):
@@ -63,7 +68,7 @@ class Animator:
 
     def compile_frames(self):
         for ind, frame in enumerate(self._raw_frames):
-            image = Image.new('RGB', (self._width, self._height))
+            image = Image.new('RGBA', (self._width, self._height), self._background)
             for drawable in frame:
                 image.paste(drawable.render_to(image))
             self._compiled_frames[ind] = image

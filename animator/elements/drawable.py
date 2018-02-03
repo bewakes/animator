@@ -24,3 +24,7 @@ class Drawable:
         """vector is a tuple (x, y)"""
         raise NotImplementedError
 
+    def get_config(self):
+        """Get the config"""
+        raise NotImplementedError
+

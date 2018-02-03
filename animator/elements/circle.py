@@ -47,7 +47,7 @@ class Circle(Drawable):
 
     def render_to(self, image):
         """
-        Return image object corresponding to the attributes
+        Return image object corresponding to the attributes.
         Parameters
         ----------
         image : a pillow Image object to which the circle is rendered
