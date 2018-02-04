@@ -22,6 +22,9 @@ class TextConfig:
         self.position = position
         self.font = font
 
+    def copy(self):
+        return TextConfig(self.text, self.color, self.size, self.position, self.font)
+
 
 class Text(Drawable):
     """
@@ -49,6 +52,7 @@ class Text(Drawable):
         """
         Returns wrapped Text object based on config and window width
         """
+        org_conf = config.copy()
         OFFSET = 15  # line height offset
         xpos = config.position[0]
         font = ImageFont.truetype(config.font, config.size)
@@ -64,14 +68,16 @@ class Text(Drawable):
                     break
                 wrapped.append(config.text[curr_pos:curr_pos+pos+1])
                 curr_pos += pos + 1
-        assert len(config.text) == len(''.join(wrapped))
-        child_texts = []
-        for i, x in enumerate(wrapped):
-            ypos = config.position[1] + lineheight + OFFSET
-            config.position = (xpos, ypos)
-            config.text = x
-            child_texts.append(Text(config))
-        return Text(config, wrapped_texts=child_texts)
+            assert len(config.text) == len(''.join(wrapped))
+            child_texts = []
+            for i, x in enumerate(wrapped):
+                ypos = config.position[1] + lineheight + OFFSET
+                config.position = (xpos, ypos)
+                config.text = x
+                child_texts.append(Text(config))
+            return Text(org_conf, wrapped_texts=child_texts)
+        else:
+            return Text(org_conf)
 
     def get_config(self):
         conf = TextConfig()
@@ -104,9 +110,17 @@ class Text(Drawable):
         colors = [(*rgb, int(255*(start_opacity + f*increment))) for f in range(frames)]
         texts = []
         for color in colors:
-            conf = self.get_config()
-            conf.color = color
-            texts.append(Text(conf))
+            if self._wrapped_texts:
+                wrapped = []
+                for x in self._wrapped_texts:
+                    conf = x.get_config()
+                    conf.color = color
+                    wrapped.append(Text(conf))
+                texts.append(wrapped)
+            else:
+                conf = self.get_config()
+                conf.color = color
+                texts.append(Text(conf))
         return texts
 
     def fade_out(self, frames=2, start_opacity=1, final_opacity=0):
@@ -119,10 +133,19 @@ class Text(Drawable):
         colors = [(*rgb, int(255*(start_opacity - f*increment))) for f in range(frames)]
         texts = []
         for color in colors:
-            conf = self.get_config()
-            conf.color = color
-            texts.append(Text(conf))
+            if self._wrapped_texts:
+                wrapped = []
+                for x in self._wrapped_texts:
+                    conf = x.get_config()
+                    conf.color = color
+                    wrapped.append(Text(conf))
+                texts.append(wrapped)
+            else:
+                conf = self.get_config()
+                conf.color = color
+                texts.append(Text(conf))
         return texts
+
 
     def roll(self, frames=2):
         """
@@ -146,9 +169,23 @@ class Text(Drawable):
         for x in range(frames):
             curr_size += chars_per_frame
             newlen = roundfunc(curr_size)
-            conf = self.get_config()
-            conf.text = self._text[:newlen]
-            text_objs.append(Text(conf))
+            if not self._wrapped_texts:
+                conf = self.get_config()
+                conf.text = self._text[:newlen]
+                text_objs.append(Text(conf))
+            else:
+                wrapped_texts = []
+                curr = newlen
+                for i, x in enumerate(self._wrapped_texts):
+                    xconf = x.get_config()
+                    if curr <= len(xconf.text):
+                        xconf.text =  xconf.text[:curr+1]
+                        wrapped_texts = self._wrapped_texts[:i]
+                        wrapped_texts.append(Text(xconf))
+                        break
+                    else:
+                        curr = curr - len(xconf.text)
+                text_objs.append(wrapped_texts)
         return text_objs
 
     def render_to(self, image):
@@ -173,7 +210,6 @@ class Text(Drawable):
             return image
 
 
-##################### helpers ###
 def _get_next_wrap_index(text, config, width, font):
     xpos = config.position[0]
     if not _exceeds_width(text, xpos, width, font):
