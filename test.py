@@ -40,11 +40,11 @@ def test_animator():
     texconf = TEXConfig()
     texconf.formula = r"\frac{\lambda}{3.4}"
     tex = TEX(texconf)
-    animator.add_frame_object(0, tex)
+    animator.add_frames_objects(0, tex.fade_out(animator.total_frames))
 
     animator.compile_frames()
     images = animator.get_compiled_frames()
-    for i, img in enumerate(images[:1]):
+    for i, img in enumerate(images):
         img.save('/tmp/temp{}.png'.format(i), subsampling=0, quality=50)
 
 if __name__ == '__main__':

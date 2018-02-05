@@ -146,7 +146,6 @@ class Text(Drawable):
                 texts.append(Text(conf))
         return texts
 
-
     def roll(self, frames=2):
         """
         display text one char at a time
