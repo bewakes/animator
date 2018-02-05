@@ -192,7 +192,6 @@ class Text(Drawable):
         """
         Return Image object corresponding to the attributes.
         """
-        # draw = ImageDraw.Draw(image)
         if not self._wrapped_texts:
             txt = Image.new('RGBA', image.size, (255,255,255,0))
             draw = ImageDraw.Draw(txt)
