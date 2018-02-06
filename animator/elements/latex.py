@@ -42,7 +42,10 @@ class TEX(Drawable):
         self._position = config.position
         self._background = config.background
         self._alpha =  config.alpha
-        self._image = image
+        if not image:
+            self._image = self._create_image()
+        else:
+            self._image = image
 
     def get_config(self):
         conf = TEXConfig()
@@ -94,7 +97,7 @@ class TEX(Drawable):
         """
             Create image using shell commands and tools
         """
-        if self._image:
+        if hasattr(self, '_image') and self._image:
             return self._image
         try:
             command = "tex2im -b transparent -t cyan"
