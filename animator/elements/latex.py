@@ -41,7 +41,7 @@ class TEX(Drawable):
         self._formula = config.formula
         self._position = config.position
         self._background = config.background
-        self._alpha =  config.alpha
+        self._alpha = config.alpha
         if not image:
             self._image = self._create_image()
         else:
@@ -85,12 +85,13 @@ class TEX(Drawable):
         return texobjs
 
     def render_to(self, image):
-        if self._image:
-            image.paste(self._image, self._position, self._image)
-        else:
+        if not self._image:
             img = self._create_image()
             self._image = img
-            image.paste(img, self._position, img)
+        size = self._image.size
+        maskimage = Image.new('RGBA', size)
+        newim = Image.blend(maskimage, self._image, self._alpha)
+        image.paste(newim, self._position, newim)
         return image
 
     def _create_image(self):
@@ -108,9 +109,6 @@ class TEX(Drawable):
             return None
         # tex2im converts to out.png by default
         img = Image.open('out.png').convert('RGBA')
-        size = img.size
         # create a new rgba image to blend the latex with the alpha
-        image = Image.new('RGBA', size)
-        newim = Image.blend(image, img, self._alpha)
         subprocess.run(["rm", "out.png"])
-        return newim
+        return img

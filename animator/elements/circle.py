@@ -78,7 +78,7 @@ class Circle(Drawable):
                 self._center[0]+vector[0],
                 self._center[1]+vector[1]
             )
-            return new
+            return [new]
         else:
             inc_x = vector[0]/float(frames)
             inc_y = vector[1]/float(frames)
@@ -86,5 +86,5 @@ class Circle(Drawable):
             curr_circle = self.copy()
             for x in range(frames):
                 circles.append(curr_circle)
-                curr_circle = curr_circle.translate((inc_x, inc_y))
+                curr_circle = curr_circle.translate((inc_x, inc_y), frames=1)[0]
             return circles

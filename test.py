@@ -6,7 +6,7 @@ from animator.elements import TEX, TEXConfig
 import math
 
 def test_animator():
-    conf = AnimatorConfig(duration=5, fps=30)
+    conf = AnimatorConfig(duration=1, fps=20)
     animator = Animator(conf)
 
     # another circle(yellow)
@@ -14,7 +14,7 @@ def test_animator():
     yellow_circle = Circle(yellow_conf)
     yellow_translated = yellow_circle.translate((0, 200), frames=int(animator.total_frames/2))
 
-    NUM_BOUNCES = 25
+    NUM_BOUNCES = 5
     bounce = 250
     ref_circle = yellow_circle
     for x in range(NUM_BOUNCES):
@@ -40,7 +40,7 @@ def test_animator():
     texconf = TEXConfig()
     texconf.formula = r"\frac{\lambda}{3.4}"
     tex = TEX(texconf)
-    animator.add_frames_objects(0, tex.fade_out(animator.total_frames))
+    animator.add_frames_objects(0, tex.fade_in(animator.total_frames))
 
     animator.compile_frames()
     images = animator.get_compiled_frames()
