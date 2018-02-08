@@ -1,7 +1,5 @@
 from PIL import Image
 import subprocess
-import re
-
 
 DEFAULT_FPS = 30
 DEFAULT_HEIGHT = 480
@@ -98,6 +96,9 @@ class Animator:
         """
         This should be in .mp4 format
         """
+        if not self._compiled_frames:
+            raise Exception("You have not compiled frames. Please call compile_frames() first")
+
         if not video_path:
             raise Exception("Please provide video path with name, only mp4 videos will be generated")
         path_splitted = video_path.split('/')
@@ -108,8 +109,6 @@ class Animator:
                 raise Exception("Please provide video path with name, only mp4 videos will be generated")
             path = '/'.join(path_splitted[:-1]) + '/' + path_splitted[-1].split('.')[0]
         path = path + '.mp4'
-        if not self._compiled_frames:
-            raise Exception("You have not compiled frames. Please call compile_frames() first")
         # ffmpeg to the rescue
         for i, frame in enumerate(self.get_compiled_frames()):
             frame.save('/tmp/frame{}.png'.format(i), subsampling=0, quality=50)
