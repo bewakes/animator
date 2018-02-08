@@ -1,4 +1,6 @@
 from PIL import Image
+import subprocess
+import re
 
 
 DEFAULT_FPS = 30
@@ -38,6 +40,7 @@ class Animator:
     _height : height of each frame
     _width : width of each frame
     _background : background color
+    _audio_path : path of audio
     """
     def __init__(self, config=AnimatorConfig()):
         self._config = config
@@ -49,6 +52,11 @@ class Animator:
         self._raw_frames = [[] for _ in range(self._total_frames)]
         self._compiled_frames = [None for _ in range(self._total_frames)]
         self._background = config.background
+        self._video_config = {
+            # for ffmpeg to take shortest  of images and audio into video
+            'shortest': True
+        }
+        self._audio_path = None
 
     @property
     def total_frames(self):
@@ -82,3 +90,46 @@ class Animator:
 
     def get_compiled_frames(self):
         return self._compiled_frames
+
+    def add_audio(self, audiopath):
+        self._audio_path = audiopath
+
+    def convert_to_video(self, video_path=None):
+        """
+        This should be in .mp4 format
+        """
+        if not video_path:
+            raise Exception("Please provide video path with name, only mp4 videos will be generated")
+        path_splitted = video_path.split('/')
+        if len(path_splitted) == 1:  # its just the name
+            path = path_splitted[0].split('.')[0]  # just take name w/o extension
+        else:
+            if not path_splitted[-1]:  # check if name is provided
+                raise Exception("Please provide video path with name, only mp4 videos will be generated")
+            path = '/'.join(path_splitted[:-1]) + '/' + path_splitted[-1].split('.')[0]
+        path = path + '.mp4'
+        if not self._compiled_frames:
+            raise Exception("You have not compiled frames. Please call compile_frames() first")
+        # ffmpeg to the rescue
+        for i, frame in enumerate(self.get_compiled_frames()):
+            frame.save('/tmp/frame{}.png'.format(i), subsampling=0, quality=50)
+        ffmpeg_command = "ffmpeg -r {fps} -s {width}x{height} -i /tmp/frame%d.png {audio_input} -shortest -crf 20 -b 4M -c:v h264 {video_path}"
+        if self._audio_path:
+            audio_input = "-i " + self._audio_path.replace(' ', '@#@#')
+        else: audio_input = ''
+        command = ffmpeg_command.format(
+            fps=self._fps,
+            width=self._width,
+            height=self._height,
+            audio_input=audio_input,
+            video_path=path
+        )
+        try:
+            command = command.split()
+            command = list(map(lambda x: x.replace('@#@#', ' '), command))
+            print(command)
+            subprocess.run(command)
+        except Exception as e:
+            print("Something went wrong." + e)
+        print("Converted video")
+

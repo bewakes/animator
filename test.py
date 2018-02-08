@@ -6,7 +6,7 @@ from animator.elements import TEX, TEXConfig
 import math
 
 def test_animator():
-    conf = AnimatorConfig(duration=1, fps=20)
+    conf = AnimatorConfig(duration=2, fps=20)
     animator = Animator(conf)
 
     # another circle(yellow)
@@ -33,8 +33,6 @@ def test_animator():
     text_conf.size = 30
     text_conf.text = "Hey, Wassup?? This video has been made by a tool created by me."
     rollertext = Text.new(text_conf, animator._width)
-    # rollertext = Text(text_conf)
-    # animator.add_frame_object(0, rollertext)
     animator.add_frames_objects(0, rollertext.roll(animator.total_frames))
 
     texconf = TEXConfig()
@@ -43,9 +41,9 @@ def test_animator():
     animator.add_frames_objects(0, tex.fade_in(animator.total_frames))
 
     animator.compile_frames()
-    images = animator.get_compiled_frames()
-    for i, img in enumerate(images):
-        img.save('/tmp/temp{}.png'.format(i), subsampling=0, quality=50)
+    animator.add_audio(r'/home/bibek/Music/short-clip.mp3')
+
+    animator.convert_to_video('/tmp/cheap.mp4')
 
 if __name__ == '__main__':
     test_animator()
