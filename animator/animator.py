@@ -1,5 +1,6 @@
 from PIL import Image
 import subprocess
+import os
 
 DEFAULT_FPS = 30
 DEFAULT_HEIGHT = 480
@@ -130,5 +131,12 @@ class Animator:
             subprocess.run(command)
         except Exception as e:
             print("Something went wrong." + e)
+        else:
+            # delete files
+            files = os.listdir('/tmp/')
+            for f in files:
+                if f.endswith(".png"):
+                    os.remove(os.path.join('/tmp',f))
+            #subprocess.run(["rm", "/tmp/frame*.png"], shell=True)
         print("Converted video")
 
