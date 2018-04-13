@@ -65,8 +65,6 @@ class Graph:
         self.line(x2, y2, *right_dest, color)
 
     def render(self):
-        if self.image is None:
-            raise Exception("Can't save, call render() first")
         self.draw_axes()
         self.draw_cells()
 
@@ -77,7 +75,6 @@ class Graph:
     def save(self, filepath):
         if self.image is None:
             raise Exception("Can't save, call render() first")
-        # TODO: save
         self.image.save(filepath)
 
     def image_coordinate(self, graph_coord):
@@ -139,5 +136,6 @@ if __name__ == '__main__':
     g = Graph(400, 400, 200, 200, 25)
     g.render()
     g.arrow(0, 0, 1, 2)
+    g.arrow(0, 0, 4, 4, 'red')
     g.arrow(0, 0, 3, 2)
     g.save('test.png')
