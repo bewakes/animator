@@ -4,7 +4,7 @@ import math
 from vectors import Vector, Point
 
 
-class Graph:
+class Space2d:
     ARROW_SIZE = 0.2  # one-fifth of cell size
     ARROW_ANGLE = 30 * math.pi / 180  # 30 degrees
 
@@ -56,13 +56,13 @@ class Graph:
         # get opposite vector from p1 to p2
         opposite = Vector(p2, p1)
         r = opposite.length
-        if r <= Graph.ARROW_SIZE * 2:   # too small to draw arrow
+        if r <= Space2d.ARROW_SIZE * 2:   # too small to draw arrow
             return
-        arr_vec = opposite.unit_vector().scale(Graph.ARROW_SIZE)
+        arr_vec = opposite.unit_vector().scale(Space2d.ARROW_SIZE)
         # arr_vec is unit vector with start point origin, translate it
         arr_vec = arr_vec.translate(p2)
-        rotated1 = arr_vec.rotate(Graph.ARROW_ANGLE)
-        rotated2 = arr_vec.rotate(-Graph.ARROW_ANGLE)
+        rotated1 = arr_vec.rotate(Space2d.ARROW_ANGLE)
+        rotated2 = arr_vec.rotate(-Space2d.ARROW_ANGLE)
         self.line(rotated1.start, rotated1.end)
         self.line(rotated2.start, rotated2.end)
 
@@ -92,7 +92,7 @@ class Graph:
 
 
 if __name__ == '__main__':
-    g = Graph(400, 400, 200, 200, 25)
+    g = Space2d(400, 400, 200, 200, 25)
     p1 = Point.origin()
     p2 = Point(1, 2)
     p3 = Point(4, 4)
