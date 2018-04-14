@@ -1,7 +1,7 @@
 from PIL import Image, ImageDraw
 import math
 
-from vectors import Vector, Point
+from vector import Vector, Point
 
 
 class Space2d:

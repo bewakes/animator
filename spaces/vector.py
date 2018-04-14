@@ -142,7 +142,8 @@ class Vector:
         return self.new(newstart, newend)
 
     def unit_vector(self):
-        start = Point.origin()
+        # self.start serves start point's class, need not override in 3d vector
+        start = self.start.origin()
         end = self.__direction.scale(1./self.length)
         return self.new(start, end)
 
