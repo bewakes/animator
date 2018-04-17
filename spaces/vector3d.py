@@ -72,6 +72,28 @@ class Vector3d(Vector):
         # TODO: implement
         pass
 
+    def dot(self, vector):
+        if not type(self) == type(vector):
+            raise Exception("Unmatched vector types")
+        return self.direction.x * vector.direction.x +\
+            self.direction.y * vector.direction.y +\
+            self.direction.z * vector.direction.z
+
+    def cross(self, vector):
+        if not type(self) == type(vector):
+            raise Exception("Unmatched vector types")
+        vx, vy, vz = vector.direction.x, vector.direction.y, vector.direction.z
+        sx, sy, sz = self.direction.x, self.direction.y, self.direction.z
+        dirx = sy*vz - vy*sz
+        diry = sz*vx - vz*sx
+        dirz = sx*vy - vx*sy
+        newstart = Point3d.origin()
+        newend = Point3d.new(dirx, diry, dirz)
+        return self.new(newstart, newend)
+
+    def to_list(self):
+        return [self.direction.x, self.direction.y, self.direction.z]
+
 
 if __name__ == '__main__':
     p = Point3d.origin()

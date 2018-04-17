@@ -89,7 +89,10 @@ class Point:
 
 
 class Vector:
-    __slots__ = ['__start', '__end', '__length', '__angle', '__direction']
+    __slots__ = [
+        '__start', '__end', '__length',
+        '__angle', '__direction', '__unit_vector'
+    ]
 
     def __init__(self, start, end):
         self.__start = start
@@ -97,6 +100,7 @@ class Vector:
         self.__length = None
         self.__direction = self.end - self.start
         self.__angle = None
+        self.__unit_vector = None
 
     @classmethod
     def new(cls, start, end):
@@ -113,6 +117,12 @@ class Vector:
     @property
     def direction(self):
         return self.__direction
+
+    def dot(self, vector):
+        if not type(self) == type(vector):
+            raise Exception("Unmatched vectors")
+        return self.direction.x * vector.direction.x +\
+            self.direction.y * vector.direction.y
 
     @property
     def length(self):
@@ -141,11 +151,14 @@ class Vector:
         newend = self.end + point
         return self.new(newstart, newend)
 
+    @property
     def unit_vector(self):
         # self.start serves start point's class, need not override in 3d vector
-        start = self.start.origin()
-        end = self.__direction.scale(1./self.length)
-        return self.new(start, end)
+        if not self.__unit_vector:
+            start = self.start.origin()
+            end = self.__direction.scale(1./self.length)
+            self.__unit_vector = self.new(start, end)
+        return self.__unit_vector
 
     def __add__(self, vec):
         # FIXME: messed up, what to return? fix this
