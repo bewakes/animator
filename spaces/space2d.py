@@ -94,7 +94,7 @@ class Space2d:
 if __name__ == '__main__':
     g = Space2d(400, 400, 200, 200, 25)
     p1 = Point.origin()
-    p2 = Point(1, 2)
+    p2 = Point(1.1, 2.5)
     p3 = Point(4, 4)
     p4 = Point(3, 2)
     g.arrow(p1, p2)
