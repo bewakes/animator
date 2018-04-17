@@ -42,6 +42,9 @@ class Point3d(Point):
             5
         )
 
+    def to_list(self):
+        return [self.x, self.y, self.z]
+
     @classmethod
     def origin(cls):
         return cls(0, 0, 0)
