@@ -6,6 +6,7 @@ DEFAULT_COLOR = (0, 0, 255, 255)
 DEFAULT_POSITION = (50, 0)
 DEFAULT_SIZE = 20
 
+
 class TextConfig:
     """Attributes for text"""
     def __init__(
@@ -14,7 +15,7 @@ class TextConfig:
             color=DEFAULT_COLOR,
             size=DEFAULT_SIZE,
             position=DEFAULT_POSITION,
-            font=None
+            font="Ubuntu-R.ttf"
             ):
         self.text = text
         self.color = color
@@ -23,7 +24,13 @@ class TextConfig:
         self.font = font
 
     def copy(self):
-        return TextConfig(self.text, self.color, self.size, self.position, self.font)
+        return TextConfig(
+            self.text,
+            self.color,
+            self.size,
+            self.position,
+            self.font
+        )
 
 
 class Text(Drawable):
@@ -62,7 +69,9 @@ class Text(Drawable):
             wrapped = []
             curr_pos = 0
             while True:
-                pos = _get_next_wrap_index(config.text[curr_pos:], config, width, font)
+                pos = _get_next_wrap_index(
+                    config.text[curr_pos:], config, width, font
+                )
                 if pos is None:
                     wrapped.append(config.text[curr_pos:])
                     break
@@ -187,16 +196,22 @@ class Text(Drawable):
                 text_objs.append(wrapped_texts)
         return text_objs
 
-    def render_to(self, image):
+    def render_to(self, image, mode='RGBA'):
         """
         Return Image object corresponding to the attributes.
         """
+        # NOTE: assumes mode = rgba, or alpha_composite wouldn't work
         if not self._wrapped_texts:
-            txt = Image.new('RGBA', image.size, (255,255,255,0))
+            txt = Image.new(mode, image.size, (255, 255, 255, 0))
             draw = ImageDraw.Draw(txt)
             if self._font:
                 font = ImageFont.truetype(self._font, self._size)
-                draw.text(self._position, self._text, fill=self._color, font=font)
+                draw.text(
+                    self._position,
+                    self._text,
+                    fill=self._color,
+                    font=font
+                )
             else:
                 draw.text(self._position, self._text, self._color)
             img = Image.alpha_composite(image, txt)

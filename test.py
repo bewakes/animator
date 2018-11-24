@@ -2,8 +2,10 @@ from animator.animator import Animator, AnimatorConfig
 from animator.elements import Circle, CircleConfig
 from animator.elements import Text, TextConfig
 from animator.elements import TEX, TEXConfig
+from animator.video import Video
 
 import math
+
 
 def test_animator():
     conf = AnimatorConfig(duration=2, fps=20)
@@ -45,5 +47,17 @@ def test_animator():
 
     animator.convert_to_video('/tmp/cheap.mp4')
 
+
+def test_video():
+    v = Video.from_file('/home/bibek/corrupted_video.mp4')
+    # print(dir(v.video))
+    textconf = TextConfig("bibek", size=100)
+    text = Text.new(textconf, v.width)
+    # render text from 10th to 20 more frames
+    v.add_text(text, 10, 20)
+    v.write_output_video('/home/bibek/test.mp4')
+
+
 if __name__ == '__main__':
-    test_animator()
+    # test_animator()
+    test_video()

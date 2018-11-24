@@ -1,5 +1,3 @@
-from copy import copy
-
 class NotImplementedError(Exception):
     pass
 
@@ -27,4 +25,3 @@ class Drawable:
     def get_config(self):
         """Get the config"""
         raise NotImplementedError
-

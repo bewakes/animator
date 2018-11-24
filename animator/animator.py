@@ -61,7 +61,6 @@ class Animator:
     def total_frames(self):
         return self._total_frames
 
-
     def add_frame_object(self, frame_index, drawable):
         """Add a drawable object to frame slot given by frame_index"""
         assert frame_index >= 0, "No negative indexing"
@@ -116,7 +115,8 @@ class Animator:
         ffmpeg_command = "ffmpeg -r {fps} -s {width}x{height} -i /tmp/frame%d.png {audio_input} -shortest -crf 20 -b 4M -c:v h264 {video_path}"
         if self._audio_path:
             audio_input = "-i " + self._audio_path.replace(' ', '@#@#')
-        else: audio_input = ''
+        else:
+            audio_input = ''
         command = ffmpeg_command.format(
             fps=self._fps,
             width=self._width,
@@ -136,7 +136,6 @@ class Animator:
             files = os.listdir('/tmp/')
             for f in files:
                 if f.endswith(".png"):
-                    os.remove(os.path.join('/tmp',f))
-            #subprocess.run(["rm", "/tmp/frame*.png"], shell=True)
+                    os.remove(os.path.join('/tmp', f))
+            # subprocess.run(["rm", "/tmp/frame*.png"], shell=True)
         print("Converted video")
-

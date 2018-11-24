@@ -1,7 +1,9 @@
 import sys
 sys.path.append('/home/bibek/projects/animator/')
+from PIL import Image, ImageDraw
 
 from vector3d import Vector3d, Point3d
+from objects3d import Line3d
 from utils.matrix import Matrix
 
 
@@ -85,11 +87,6 @@ class Camera:
         return self.__matrix
 
 
-class Object3d:
-    def __init__(self):
-        pass
-
-
 class Space3d:
     def __init__(self, camera, width, height, depth, cell_size=20):
         # NOTE: origin will be in the center of the cube
@@ -98,73 +95,123 @@ class Space3d:
         self.width = width
         self.height = height
         self.depth = depth
-        self.cell_size = cell_size 
+        self.cell_size = cell_size
+        self.image = Image.new(
+            'RGB',
+            (self.width*self.cell_size, self.height*self.cell_size),
+            'black'
+        )
+        self.__objects = []
+        self.__rendered = False
+        self.__renderer = ImageDraw.Draw(self.image)
         # TODO: add generic objects later
-        self.lines = []  # [(Point3d, Point3d), ...]
+
+    @property
+    def objects(self):
+        return self.__objects
+
+    @property
+    def renderer(self):
+        return self.__renderer
+
+    def add_object(self, obj):
+        # need to run render_scene() after this, so set to false
+        self.__rendered = False
+        self.__objects.append(obj)
 
     def add_axes(self):
+        # need to run render_scene() after this, so set false
+        self.__rendered = False
         # add x axis
-        self.lines.append((
-            Point3d(-self.width, 0, 0),
-            Point3d(self.width, 0, 0)
-        ))
+        self.objects.append(
+            Line3d(
+                Point3d(-self.width, 0, 0),
+                Point3d(self.width, 0, 0),
+                color="blue",
+                thickness=2
+            )
+        )
         # add y axis
-        self.lines.append((
-            Point3d(0, -self.height, 0),
-            Point3d(0, self.height, 0))
+        self.objects.append(
+            Line3d(
+                Point3d(0, -self.height, 0),
+                Point3d(0, self.height, 0),
+                color="blue",
+                thickness=2
+            )
         )
         # add z axis
-        self.lines.append((
-            Point3d(0, 0, -self.depth),
-            Point3d(0, 0, self.depth))
+        self.objects.append(
+            Line3d(
+                Point3d(0, 0, -self.depth),
+                Point3d(0, 0, self.depth),
+                color="blue",
+                thickness=2
+            )
         )
 
     def add_cells(self):
         w, h, d, cs = self.width, self.height, self.depth, self.cell_size
         # lines parallel to x axis in xy plane (+y)
-        for z in range(cs, d, cs):
+        for z in range(-d, d, cs):
             for x in range(-h, h, cs):
-                self.lines.append((
-                    Point3d(-w, x, z),
-                    Point3d(w, x, z)
-                ))
+                self.objects.append(
+                    Line3d(
+                        Point3d(-w, x, z),
+                        Point3d(w, x, z),
+                        color="cyan"
+                    )
+                )
         # lines parallel to x axis in xz plane (+z)
-        for y in range(cs, h, cs):
+        for y in range(-h, h, cs):
             for z in range(-d, d, cs):
-                self.lines.append((
-                    Point3d(-w, y, z),
-                    Point3d(w, y, z)
-                ))
+                self.objects.append(
+                    Line3d(
+                        Point3d(-w, y, z),
+                        Point3d(w, y, z),
+                        color="cyan"
+                    )
+                )
         # lines parallel to y axis in xy plane (+x)
-        for z in range(cs, d, cs):
+        for z in range(-d, d, cs):
             for x in range(-w, w, cs):
-                self.lines.append((
-                    Point3d(x, -h, z),
-                    Point3d(x, h, z)
-                ))
+                self.objects.append(
+                    Line3d(
+                        Point3d(x, -h, z),
+                        Point3d(x, h, z),
+                        color="cyan"
+                    )
+                )
         # lines parallel to y axis in yz plane (+z)
-        for x in range(cs, w, cs):
+        for x in range(-w, w, cs):
             for z in range(-d, d, cs):
-                self.lines.append((
-                    Point3d(x, -h, z),
-                    Point3d(x, h, z)
-                ))
+                self.objects.append(
+                    Line3d(
+                        Point3d(x, -h, z),
+                        Point3d(x, h, z),
+                        color="cyan"
+                    )
+                )
         # lines parallel to z axis in xz plane (+x)
-        # NOTE: issue
-        for y in range(cs, h, cs):
+        for y in range(-h, h, cs):
             for x in range(-w, w, cs):
-                self.lines.append((
-                    Point3d(x, y, -d),
-                    Point3d(x, y, d)
-                ))
+                self.objects.append(
+                    Line3d(
+                        Point3d(x, y, -d),
+                        Point3d(x, y, d),
+                        color="cyan"
+                    )
+                )
         # lines parallel to z axis in yz plane (+y)
-        # NOTE: issue
-        for x in range(cs, w, cs):
+        for x in range(-w, w, cs):
             for y in range(-h, h, cs):
-                self.lines.append((
-                    Point3d(x, y, -d),
-                    Point3d(x, y, d)
-                ))
+                self.objects.append(
+                    Line3d(
+                        Point3d(x, y, -d),
+                        Point3d(x, y, d),
+                        color="cyan"
+                    )
+                )
 
     def transform_point(self, point3d):
         pointarr = [*point3d.to_list(), 1.]
@@ -178,31 +225,31 @@ class Space3d:
         except Exception as e:  # DivisionByZero in fact
             return None
 
+    def render_scene(self):
+        for obj in self.objects:
+            obj.render(self)
+        self.__rendered = True
+
+    def save_scene(self, filepath):
+        if not self.__rendered:
+            raise Exception('Scene not rendered/updated. Call render_scene() first.')
+        self.image.save(filepath)
+
 
 if __name__ == '__main__':
     projection = Projection(5, 5, 5)
     # camera properties
-    pos = Point3d(0, 0, 0)
-    target = Point3d(0, 0, 1)
+    pos = Point3d(0, 0, 1)
+    target = Point3d(0, 0, 2)
     up = Vector3d.new(Point3d.origin(), Point3d(0, 1, 0))
     camera = Camera(pos, target, up, projection)
-    size = 30
-    space = Space3d(camera, size, size, size, 5)
+    size = 100
+    space = Space3d(camera, size, size, size, 10)
+    print(space.transform_point(Point3d(1,1,2)))
+    assert False
     space.add_axes()
     space.add_cells()
-    print(len(space.lines))
+    print(len(space.objects))
 
-    from spaces.space2d import Space2d
-    from spaces.vector import Point
-
-    g = Space2d(400, 400, 200, 200, 25)
-    # g.render()
-    for x in space.lines:
-        p1tx = space.transform_point(x[0])
-        p2tx = space.transform_point(x[1])
-        if p1tx is None or p2tx is None:
-            continue
-        p1 = Point(*p1tx)
-        p2 = Point(*p2tx)
-        g.line(p1, p2)
-    g.save('test.png')
+    space.render_scene()
+    space.save_scene('test.png')
