@@ -27,8 +27,8 @@ def test_animator():
         bounce *= -1
 
     # add text
-    font = "arial.ttf"
-    text_conf = TextConfig(text="bibek", size=40, position=(200, 200), font=font)
+    # font = "arial.ttf"
+    text_conf = TextConfig(text="bibek", size=40, position=(200, 200)) # , font=font)
 
     text_conf.position = (50, 50)
     text_conf.color = (135, 206, 250, 255)
@@ -59,5 +59,5 @@ def test_video():
 
 
 if __name__ == '__main__':
-    # test_animator()
-    test_video()
+    test_animator()
+    # test_video()
